@@ -125,7 +125,12 @@ def perform_test(test_loader, model, test_meter, cfg, writer=None):
             save_path = os.path.join(cfg.OUTPUT_DIR, cfg.TEST.SAVE_RESULTS_PATH)
 
             with PathManager.open(save_path, "wb") as f:
-                pickle.dump([all_labels, all_labels], f)
+                paths = test_loader.dataset._path_to_videos[::(cfg.TEST.NUM_ENSEMBLE_VIEWS *
+                                                               cfg.TEST.NUM_SPATIAL_CROPS)]
+                result = {"paths": paths,
+                          "predictions": all_preds,
+                          "labels": all_labels}
+                pickle.dump(result, f)
 
             logger.info(
                 "Successfully saved prediction results to {}".format(save_path)
