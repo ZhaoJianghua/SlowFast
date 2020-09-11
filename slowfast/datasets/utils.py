@@ -107,13 +107,17 @@ def pack_pathway_output(cfg, frames):
 
 
 def spatial_sampling(
-    frames,
-    spatial_idx=-1,
-    min_scale=256,
-    max_scale=320,
-    crop_size=224,
-    random_horizontal_flip=True,
-    inverse_uniform_sampling=False,
+        frames,
+        spatial_idx=-1,
+        min_scale=256,
+        max_scale=320,
+        crop_size=224,
+        random_horizontal_flip=True,
+        inverse_uniform_sampling=False,
+        random_crop_horizontal_idx=0,
+        random_crop_horizontal_num=1,
+        random_crop_vertical_idx=0,
+        random_crop_vertical_num=1,
 ):
     """
     Perform spatial sampling on the given video frames. If spatial_idx is
@@ -131,10 +135,16 @@ def spatial_sampling(
         max_scale (int): the maximal size of scaling.
         crop_size (int): the size of height and width used to crop the
             frames.
+        random_horizontal_flip (bool): if True, do random horizontal flip on
+            frames.
         inverse_uniform_sampling (bool): if True, sample uniformly in
             [1 / max_scale, 1 / min_scale] and take a reciprocal to get the
             scale. If False, take a uniform sample from [min_scale,
             max_scale].
+        random_crop_horizontal_idx (int): the crop index on the horizontal.
+        random_crop_horizontal_num (int): the crop number on the horizontal.
+        random_crop_vertical_idx (int): the crop index on the vertical.
+        random_crop_vertical_num (int): the crop number on the vertical.
     Returns:
         frames (tensor): spatially sampled frames.
     """
@@ -146,7 +156,12 @@ def spatial_sampling(
             max_size=max_scale,
             inverse_uniform_sampling=inverse_uniform_sampling,
         )
-        frames, _ = transform.random_crop(frames, crop_size)
+        frames, _ = transform.random_crop(
+            frames, crop_size,
+            crop_w_idx=random_crop_horizontal_idx,
+            crop_w_num=random_crop_horizontal_num,
+            crop_h_idx=random_crop_vertical_idx,
+            crop_h_num=random_crop_vertical_num)
         if random_horizontal_flip:
             frames, _ = transform.horizontal_flip(0.5, frames)
     else:

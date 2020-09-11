@@ -182,7 +182,7 @@ _C.MODEL.NUM_CLASSES = 400
 _C.MODEL.LOSS_FUNC = "cross_entropy"
 
 # Model architectures that has one single pathway.
-_C.MODEL.SINGLE_PATHWAY_ARCH = ["c2d", "i3d", "slow"]
+_C.MODEL.SINGLE_PATHWAY_ARCH = ["c2d", "i3d", "slow", "CNNCatLSTM"]
 
 # Model architectures that has multiple pathways.
 _C.MODEL.MULTI_PATHWAY_ARCH = ["slowfast"]
@@ -273,6 +273,12 @@ _C.DATA.INV_UNIFORM_SAMPLE = False
 
 # If True, perform random horizontal flip on the video frames during training.
 _C.DATA.RANDOM_FLIP = True
+
+# random crop on set grid
+_C.DATA.RANDOM_CROP_HORIZONTAL_IDX = 0
+_C.DATA.RANDOM_CROP_HORIZONTAL_NUM = 1
+_C.DATA.RANDOM_CROP_VERTICAL_IDX = 0
+_C.DATA.RANDOM_CROP_VERTICAL_NUM = 1
 
 # If True, calculdate the map as metric.
 _C.DATA.MULTI_LABEL = False

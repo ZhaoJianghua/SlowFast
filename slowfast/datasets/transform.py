@@ -82,7 +82,8 @@ def crop_boxes(boxes, x_offset, y_offset):
     return cropped_boxes
 
 
-def random_crop(images, size, boxes=None):
+def random_crop(images, size, boxes=None, crop_w_idx=0, crop_w_num=1,
+                crop_h_idx=0, crop_h_num=1):
     """
     Perform random spatial crop on the given images and corresponding boxes.
     Args:
@@ -91,6 +92,10 @@ def random_crop(images, size, boxes=None):
         size (int): the size of height and width to crop on the image.
         boxes (ndarray or None): optional. Corresponding boxes to images.
             Dimension is `num boxes` x 4.
+        crop_w_idx (int): the crop index on the width.
+        crop_w_num (int): the crop number on the width.
+        crop_h_idx (int): the crop index on the height.
+        crop_h_num (int): the crop number on the height.
     Returns:
         cropped (tensor): cropped images with dimension of
             `num frames` x `channel` x `size` x `size`.
@@ -103,13 +108,17 @@ def random_crop(images, size, boxes=None):
     width = images.shape[3]
     y_offset = 0
     if height > size:
-        y_offset = int(np.random.randint(0, height - size))
+        delta = (height - size) / crop_h_num
+        st, ed = int(round(crop_h_idx * delta)), int(round(crop_h_idx * delta + delta))
+        y_offset = int(np.random.randint(st, ed))
     x_offset = 0
     if width > size:
-        x_offset = int(np.random.randint(0, width - size))
+        delta = (width - size) / crop_w_num
+        st, ed = int(round(crop_w_idx * delta)), int(round(crop_w_idx * delta + delta))
+        x_offset = int(np.random.randint(st, ed))
     cropped = images[
-        :, :, y_offset : y_offset + size, x_offset : x_offset + size
-    ]
+              :, :, y_offset: y_offset + size, x_offset: x_offset + size
+              ]
 
     cropped_boxes = (
         crop_boxes(boxes, x_offset, y_offset) if boxes is not None else None
@@ -184,8 +193,8 @@ def uniform_crop(images, size, spatial_idx, boxes=None):
         elif spatial_idx == 2:
             x_offset = width - size
     cropped = images[
-        :, :, y_offset : y_offset + size, x_offset : x_offset + size
-    ]
+              :, :, y_offset: y_offset + size, x_offset: x_offset + size
+              ]
 
     cropped_boxes = (
         crop_boxes(boxes, x_offset, y_offset) if boxes is not None else None
@@ -246,7 +255,7 @@ def grayscale(images):
     # R -> 0.299, G -> 0.587, B -> 0.114.
     img_gray = torch.tensor(images)
     gray_channel = (
-        0.299 * images[:, 2] + 0.587 * images[:, 1] + 0.114 * images[:, 0]
+            0.299 * images[:, 2] + 0.587 * images[:, 1] + 0.114 * images[:, 0]
     )
     img_gray[:, 0] = gray_channel
     img_gray[:, 1] = gray_channel
@@ -392,7 +401,7 @@ def color_normalization(images, mean, stddev):
     """
     assert len(mean) == images.shape[1], "channel mean not computed properly"
     assert (
-        len(stddev) == images.shape[1]
+            len(stddev) == images.shape[1]
     ), "channel stddev not computed properly"
 
     out_images = torch.zeros_like(images)

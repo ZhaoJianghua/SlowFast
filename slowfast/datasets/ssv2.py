@@ -251,6 +251,10 @@ class Ssv2(torch.utils.data.Dataset):
             crop_size=crop_size,
             random_horizontal_flip=self.cfg.DATA.RANDOM_FLIP,
             inverse_uniform_sampling=self.cfg.DATA.INV_UNIFORM_SAMPLE,
+            random_crop_horizontal_idx=self.cfg.DATA.RANDOM_CROP_HORIZONTAL_IDX,
+            random_crop_horizontal_num=self.cfg.DATA.RANDOM_CROP_HORIZONTAL_NUM,
+            random_crop_vertical_idx=self.cfg.DATA.RANDOM_CROP_VERTICAL_IDX,
+            random_crop_vertical_num=self.cfg.DATA.RANDOM_CROP_VERTICAL_NUM,
         )
         frames = utils.pack_pathway_output(self.cfg, frames)
         return frames, label, index, {}
