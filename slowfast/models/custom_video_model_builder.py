@@ -56,7 +56,15 @@ class CNNCatLSTM(nn.Module):
 
         self.backbone = ResNetBackbone(Bottleneck, (d2, d3, d4, d5))
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.lstm = nn.LSTM(2048, 256)
+        self.embedding = nn.Sequential(
+            nn.Linear(2048, 512),
+            nn.ReLU(inplace=True),
+            nn.Linear(512, 512),
+            nn.ReLU(inplace=True),
+            nn.Dropout(p=0.3),
+            nn.Linear(512, 512),
+        )
+        self.lstm = nn.LSTM(512, 256)
 
         if dropout_rate > 0.0:
             self.dropout = nn.Dropout(dropout_rate)
@@ -84,6 +92,8 @@ class CNNCatLSTM(nn.Module):
         x = self.backbone(x)
         x = self.avgpool(x)
         x = x.view(batch, t, -1)
+
+        x = self.embedding(x)
 
         x, (hn, cn) = self.lstm(x)
         x = x[:, -1, :]
